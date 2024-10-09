@@ -13,6 +13,8 @@ const GetLoanController = async (req: Request, res: Response) => {
         const loans = new Loans();
         const loanData = await loans.findAll();
 
+        console.log(loanData);
+        
         // if(staffData.loa)
         // }else{
         //     return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({

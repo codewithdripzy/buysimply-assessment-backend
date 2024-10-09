@@ -8,23 +8,6 @@ import { VerifyToken } from "./controllers/auth";
 import { verifyAPI, defaulFallback, noRouteFound } from "./controllers/default";
 import { BuySimplyServerStruct } from "./core/interfaces";
 import authRouter from "./routes/auth";
-// import authRouter from "./routes/auth";
-// import Database from "./config/database";
-// import assistantRouter from "./routes/assistants";
-// import phoneNumberRouter from "./routes/phone";
-// import phoneCallRouter from "./routes/call";
-// import uploadRouter from "./routes/uploads";
-// import analyticsRouter from "./routes/analytics";
-// import pricingRouter from "./routes/pricing";
-// import campaignRouter from "./routes/campaign";
-// import paymentRouter from "./routes/pay";
-// import swaggerUi from "swagger-ui-express";
-// import swaggerFile from "./swagger.json";
-// import { AmiraServerStruct } from "./core/struct";
-// import { defaulFallback, noRouteFound, verifyAPI } from "./controllers/default";
-// import { deepLinkRouter } from "./routes/deeplink";
-
-
 
 class BuySimplyServer{
     app : express.Application;
@@ -35,7 +18,6 @@ class BuySimplyServer{
         this.app = express();
 
         this.setup();
-        this.connect();
         this.route();
     }
 
@@ -45,25 +27,6 @@ class BuySimplyServer{
         this.app.use(express.urlencoded({ extended: true, limit : '10mb' }));
         this.app.use('/data', express.static(path.join(__dirname, '../src/data')));
 
-    }
-
-    async connect(){
-        // const database = new Database();
-        // this.db = await database.getConnection();
-        // this.io.on("connection", (socket) => {
-        //     console.log("User connected to Assitant");
-
-        //     socket.on("transcript", async (message) => {
-        //         console.log(message);
-        //         const response = await ChatProcessingController(message);
-                
-        //         if(response) return socket.emit("amira-transcript", response);
-        //     });
-
-        //     socket.on("disconnect", () => {
-        //         console.log("User disconnected");
-        //     });
-        // });
     }
 
     route(){
