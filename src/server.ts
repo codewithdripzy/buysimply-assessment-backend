@@ -1,8 +1,8 @@
 // import http from "http";
 import cors from "cors";
 import path from "path";
+import morgan from "morgan";
 import express from "express";
-import dotenv from "dotenv";
 import authRouter from "./routes/auth";
 import loanRouter from "./routes/loans";
 import session from "express-session";
@@ -24,6 +24,7 @@ class BuySimplyServer{
 
     setup(){
         this.app.use(cors());
+        this.app.use(morgan('tiny'))
         this.app.use(express.json());
         this.app.use(session({
             secret: process.env.BUYSIMPLY_SESSION_SECRET ?? '',
