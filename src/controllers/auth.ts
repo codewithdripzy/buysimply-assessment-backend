@@ -36,18 +36,21 @@ const LoginAuthController = async (req: Request, res: Response) => {
         });
 
         if(account.password == password){
-            const token = jwt.sign(
-            {
+            const token = jwt.sign({
                 id: account.id,
                 email: account.email,
                 role: account.role
-            },
-            BUYSIMPLY_JWT_SECRET,
-            { expiresIn: "1h" },);
+            }, BUYSIMPLY_JWT_SECRET,  { expiresIn: "1h" },);
             const refreshToken = jwt.sign(
                 token,
                 BUYSIMPLY_JWT_REFRESH_SECRET,
             );
+
+            // store token in session
+            req.session.token = token;
+            req.session.save((err) => res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
+                error: "Something went wrong, Try again",
+            }));
 
             return res.status(HTTP_RESPONSE_CODE.OK).json({
                 name: account.name,
@@ -126,7 +129,8 @@ const LogoutAuthController = async (req: Request, res: Response) => {
         // Clear the session or token
         req.session.destroy((err) => res.status(HTTP_RESPONSE_CODE.OK).json({
             message: "Something went wrong, try again"
-        }))
+        }));
+
         return res.status(HTTP_RESPONSE_CODE.OK).json({
             message: "Successfully logged out"
         });

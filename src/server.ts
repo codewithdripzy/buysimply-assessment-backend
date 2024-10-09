@@ -10,6 +10,12 @@ import { VerifyToken } from "./controllers/auth";
 import { verifyAPI, defaulFallback, noRouteFound } from "./controllers/default";
 import { BuySimplyServerStruct } from "./core/interfaces";
 
+declare module 'express-session' {
+    interface SessionData {
+        token: string;
+    }
+}
+
 class BuySimplyServer{
     app : express.Application;
     port : number;
