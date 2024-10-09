@@ -1,33 +1,24 @@
 import fs from "fs";
 import path from "path";
-import * as jwt from "jsonwebtoken";
+import Loans from "../model/loans";
 import Staff from "../model/staffs";
+import * as jwt from "jsonwebtoken";
 import { configDotenv } from "dotenv";
 import { Request, Response } from "express";
-import { HTTP_RESPONSE_CODE } from "../core/values";
-import Loans from "../model/loans";
-import { BuySimplyTokenStruct, LoanStruct } from "../core/struct";
-import { AccessLevel, LoanStatus } from "../core/enums";
 import { validateEmail } from "../utils/functions";
+import { HTTP_RESPONSE_CODE } from "../core/values";
+import { AccessLevel, LoanStatus } from "../core/enums";
+import { BuySimplyTokenStruct, LoanStruct } from "../core/struct";
 
 const GetLoanController = async (req: Request, res: Response) => {
     try {
         configDotenv();
+
         const { status } = req.query;
         const { loanState } = req.params;
+        const { id, email, role } = res.locals.staffData;
         
         const staff = new Staff();
-        const secret = process.env.BUYSIMPLY_JWT_SECRET;
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if(!token) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
-            error: "No Api Token Provided"
-        });
-
-        if(!secret) return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
-            error: " Something went wrong, Try again"
-        });
-
         const loans = new Loans();
         let loanData : LoanStruct[] | null = await loans.findAll();
 
@@ -35,11 +26,10 @@ const GetLoanController = async (req: Request, res: Response) => {
             data: []
         });
 
-        const verifyToken : BuySimplyTokenStruct = jwt.verify(token, secret) as unknown as BuySimplyTokenStruct;
         const userExists = await staff.findOne({
-            id: verifyToken.id,
-            email: verifyToken.email,
-            role: verifyToken.role as AccessLevel,
+            id,
+            email,
+            role: role as AccessLevel,
         });
        
         if(!userExists) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
@@ -47,7 +37,7 @@ const GetLoanController = async (req: Request, res: Response) => {
         });
 
         
-        if(verifyToken.role == AccessLevel.STAFF){
+        if(role == AccessLevel.STAFF){
             loanData = loanData?.map((loan) => ({
                 id: loan.id,
                 amount: loan.amount,

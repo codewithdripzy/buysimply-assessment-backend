@@ -98,8 +98,12 @@ const VerifyToken = async (req: Request, res: Response, nextFunction: NextFuncti
             });
 
             // pass staff data to next function
-            // req.session.save(() => )
-            // req.query.staffData = `?id=${verifyToken.id}&email=${verifyToken.email}&role=${verifyToken.role}`;
+            res.locals.staffData = {
+                id: verifyToken.id,
+                email: verifyToken.email,
+                role: verifyToken.role
+            }
+            
             return nextFunction();
         }else{
             return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
