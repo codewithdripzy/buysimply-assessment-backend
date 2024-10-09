@@ -65,7 +65,7 @@ const GetLoanController = async (req: Request, res: Response) => {
                 const today = new Date();
                 const maturityDate = new Date(loan.maturityDate);
 
-                return today > maturityDate;
+                return today >= maturityDate;
             })
         }
 
