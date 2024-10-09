@@ -70,11 +70,6 @@ const GetLoanController = async (req: Request, res: Response) => {
         }
 
         return res.status(HTTP_RESPONSE_CODE.OK).json(loanData)
-        // }else{
-        //     return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
-        //         message: "Something went wrong on our end, It's not your fault"
-        //     });
-        // }
     } catch (error) {
         return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
             message: "An error ocurred, Try again"
@@ -87,19 +82,9 @@ const GetUserLoanController = async (req: Request, res: Response) => {
         configDotenv();
         const { status } = req.query;
         const { email } = req.params;
+        const { id, staffEmail, role} = res.locals.staffData;
         
         const staff = new Staff();
-        const secret = process.env.BUYSIMPLY_JWT_SECRET;
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if(!token) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
-            error: "No Api Token Provided"
-        });
-
-        if(!secret) return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
-            error: " Something went wrong, Try again"
-        });
-
         const loans = new Loans();
         let loanData : LoanStruct[] | null = await loans.findAll();
 
@@ -107,11 +92,10 @@ const GetUserLoanController = async (req: Request, res: Response) => {
             data: []
         });
 
-        const verifyToken : BuySimplyTokenStruct = jwt.verify(token, secret) as unknown as BuySimplyTokenStruct;
         const userExists = await staff.findOne({
-            id: verifyToken.id,
-            email: verifyToken.email,
-            role: verifyToken.role as AccessLevel,
+            id,
+            email: staffEmail,
+            role: role as AccessLevel,
         });
        
         if(!userExists) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
@@ -119,7 +103,7 @@ const GetUserLoanController = async (req: Request, res: Response) => {
         });
 
         
-        if(verifyToken.role == AccessLevel.STAFF){
+        if(role == AccessLevel.STAFF){
             loanData = loanData?.map((loan) => ({
                 id: loan.id,
                 amount: loan.amount,
@@ -150,11 +134,6 @@ const GetUserLoanController = async (req: Request, res: Response) => {
         }
 
         return res.status(HTTP_RESPONSE_CODE.OK).json(loanData)
-        // }else{
-        //     return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
-        //         message: "Something went wrong on our end, It's not your fault"
-        //     });
-        // }
     } catch (error) {
         return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
             message: "An error ocurred, Try again"
