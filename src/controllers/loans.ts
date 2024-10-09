@@ -170,4 +170,69 @@ const GetUserLoanController = async (req: Request, res: Response) => {
     }
 }
 
-export {  GetLoanController, GetUserLoanController }
+const DeleteUserLoanController = async (req: Request, res: Response) => {
+    try {
+        configDotenv();
+        const { loanId } = req.params;
+        
+        const staff = new Staff();
+        const secret = process.env.BUYSIMPLY_JWT_SECRET;
+        const token = req.headers.authorization?.split(" ")[1];
+
+        if(!loanId) return res.status(HTTP_RESPONSE_CODE.BAD_REQUEST).json({
+            error: "Provide ID for loan to be deleted"
+        });
+
+        if(!token) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
+            error: "No Api Token Provided"
+        });
+
+        if(!secret) return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
+            error: " Something went wrong, Try again"
+        });
+
+        const loans = new Loans();
+        let loanData : LoanStruct[] | null = await loans.findAll();
+
+        if(!loanData) return res.status(HTTP_RESPONSE_CODE.OK).json({
+            data: []
+        });
+
+        const verifyToken : BuySimplyTokenStruct = jwt.verify(token, secret) as unknown as BuySimplyTokenStruct;
+        const userExists = await staff.findOne({
+            id: verifyToken.id,
+            email: verifyToken.email,
+            role: verifyToken.role as AccessLevel,
+        });
+       
+        if(!userExists) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
+            error: "Account not Found, you are unable to perform this action"
+        });
+
+        
+        if(verifyToken.role == AccessLevel.SUPER_ADMINSITRATOR){
+            // delete
+            loanData = loanData?.map((loan) => ({
+                id: loan.id,
+                amount: loan.amount,
+                maturityDate: loan.maturityDate,
+                status: loan.status,
+                applicant: {
+                    name: loan.applicant.name,
+                    email: loan.applicant.email,
+                    telephone: loan.applicant.telephone,
+                },
+                createdAt: loan.createdAt,
+            }));
+        }else{
+            return res.status(HTTP_RESPONSE_CODE.FORBIDDEN).json({
+                error: "Only Super Admin are allowed to perfom this action"
+            });
+        }
+    } catch (error) {
+        return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
+            message: "Something went wrong, Try again"
+        })
+    }
+}
+export {  GetLoanController, GetUserLoanController, DeleteUserLoanController }
