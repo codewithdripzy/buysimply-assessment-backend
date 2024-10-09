@@ -1,3 +1,5 @@
+import fs from "fs";
+import path from "path";
 import * as jwt from "jsonwebtoken";
 import Staff from "../model/staffs";
 import { configDotenv } from "dotenv";
@@ -211,12 +213,17 @@ const DeleteUserLoanController = async (req: Request, res: Response) => {
 
         
         if(verifyToken.role == AccessLevel.SUPER_ADMINSITRATOR){
-            loanData = loanData.filter((loan) => loan.id == loanId);
-
-            if(loanData.length < 1) return res.status(HTTP_RESPONSE_CODE.NOT_FOUND).json({
+            const loanExists = loanData.filter((loan) => loan.id == loanId);
+            const newLoanData = loanData.filter((loan) => loan.id !== loanId);
+            
+            if(loanExists.length < 1) return res.status(HTTP_RESPONSE_CODE.NOT_FOUND).json({
                 error: "Loan Not Found"
             })
+
             // write new loan data to file
+            const filePath = path.join(__dirname, 'src', 'data', 'loans.json');
+            fs.writeFileSync(filePath, JSON.stringify(newLoanData, null, 2), 'utf8');
+
             return res.status(HTTP_RESPONSE_CODE.OK).json({
                 message: "Loan deleted successfully",
             });
