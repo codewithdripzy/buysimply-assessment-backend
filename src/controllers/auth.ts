@@ -48,9 +48,7 @@ const LoginAuthController = async (req: Request, res: Response) => {
 
             // store token in session
             req.session.token = token;
-            req.session.save((err) => res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
-                error: "Something went wrong, Try again",
-            }));
+            req.session.save((err) => {if(err) console.log(err)});
 
             return res.status(HTTP_RESPONSE_CODE.OK).json({
                 name: account.name,
