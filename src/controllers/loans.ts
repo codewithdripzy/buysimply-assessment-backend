@@ -213,10 +213,13 @@ const DeleteUserLoanController = async (req: Request, res: Response) => {
         if(verifyToken.role == AccessLevel.SUPER_ADMINSITRATOR){
             loanData = loanData.filter((loan) => loan.id == loanId);
 
+            if(loanData.length < 1) return res.status(HTTP_RESPONSE_CODE.NOT_FOUND).json({
+                error: "Loan Not Found"
+            })
             // write new loan data to file
             return res.status(HTTP_RESPONSE_CODE.OK).json({
                 message: "Loan deleted successfully",
-            })
+            });
         }else{
             return res.status(HTTP_RESPONSE_CODE.FORBIDDEN).json({
                 error: "Only Super Admin are allowed to perfom this action"
