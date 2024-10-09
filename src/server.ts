@@ -26,7 +26,6 @@ class BuySimplyServer{
         this.app.use(express.json());
         this.app.use(express.urlencoded({ extended: true, limit : '10mb' }));
         this.app.use('/data', express.static(path.join(__dirname, '../src/data')));
-
     }
 
     route(){

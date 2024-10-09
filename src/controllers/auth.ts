@@ -118,39 +118,6 @@ const LogoutAuthController = async (req: Request, res: Response) => {
     try {
         configDotenv();
         
-        const staff = new Staff();
-
-        const secret = process.env.BUYSIMPLY_JWT_SECRET;
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if(!secret) return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
-            error: "Cannot login at this time, Try again later"
-        });
-        if(!token) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
-            error: "No token provided"
-        });
-        
-
-        // validate token and check if user is valid
-        if(secret){
-            const verifyToken : BuySimplyTokenStruct = jwt.verify(token, secret) as BuySimplyTokenStruct;
-            const userExists = await staff.findOne({
-                id: verifyToken.id,
-                email: verifyToken.email,
-                role: verifyToken.role as AccessLevel,
-            });
-            
-            if(!userExists) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
-                error: "Account not Found, you are unable to perform this action"
-            });
-
-            // pass staff data to next function
-            req.query.staffData = `?id=${verifyToken.id}&email=${verifyToken.email}&role=${verifyToken.role}`;
-        }else{
-            return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
-                message: "Something went wrong on our end, It's not your fault"
-            });
-        }
     } catch (error) {
         console.log(error);
         
