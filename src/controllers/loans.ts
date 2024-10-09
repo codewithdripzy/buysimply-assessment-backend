@@ -221,7 +221,7 @@ const DeleteUserLoanController = async (req: Request, res: Response) => {
             })
 
             // write new loan data to file
-            const filePath = path.join(__dirname, 'src', 'data', 'loans.json');
+            const filePath = path.join(__dirname, '../data', 'loans.json');
             fs.writeFileSync(filePath, JSON.stringify(newLoanData, null, 2), 'utf8');
 
             return res.status(HTTP_RESPONSE_CODE.OK).json({
@@ -233,6 +233,8 @@ const DeleteUserLoanController = async (req: Request, res: Response) => {
             });
         }
     } catch (error) {
+        console.log(error);
+        
         return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
             message: "Something went wrong, Try again"
         })
