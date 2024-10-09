@@ -12,6 +12,7 @@ const GetLoanController = async (req: Request, res: Response) => {
     try {
         configDotenv();
         const { status } = req.query;
+        const { loanState } = req.params;
         
         const staff = new Staff();
         const secret = process.env.BUYSIMPLY_JWT_SECRET;
@@ -64,6 +65,15 @@ const GetLoanController = async (req: Request, res: Response) => {
         }else{
             return res.status(HTTP_RESPONSE_CODE.BAD_REQUEST).json({
                 error: `No status of Type<${status}> found`
+            })
+        }
+
+        if(loanState && loanState == "expired"){
+            loanData = loanData.filter((loan) => {
+                const today = new Date();
+                const maturityDate = new Date(loan.maturityDate);
+
+                return today > maturityDate;
             })
         }
 
