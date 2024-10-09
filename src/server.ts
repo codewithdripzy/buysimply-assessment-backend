@@ -2,12 +2,13 @@
 import cors from "cors";
 import path from "path";
 import express from "express";
-// import { v4 } from "uuidv4";
+import dotenv from "dotenv";
+import authRouter from "./routes/auth";
 import loanRouter from "./routes/loans";
+import session from "express-session";
 import { VerifyToken } from "./controllers/auth";
 import { verifyAPI, defaulFallback, noRouteFound } from "./controllers/default";
 import { BuySimplyServerStruct } from "./core/interfaces";
-import authRouter from "./routes/auth";
 
 class BuySimplyServer{
     app : express.Application;
@@ -24,6 +25,12 @@ class BuySimplyServer{
     setup(){
         this.app.use(cors());
         this.app.use(express.json());
+        this.app.use(session({
+            secret: '',
+            resave: false,
+            saveUninitialized: true,
+            cookie: { secure: true }
+        }));
         this.app.use(express.urlencoded({ extended: true, limit : '10mb' }));
         this.app.use('/data', express.static(path.join(__dirname, '../src/data')));
     }
