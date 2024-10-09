@@ -5,11 +5,12 @@ import { Request, Response } from "express";
 import { HTTP_RESPONSE_CODE } from "../core/values";
 import Loans from "../model/loans";
 import { BuySimplyTokenStruct, LoanStruct } from "../core/struct";
-import { AccessLevel } from "../core/enums";
+import { AccessLevel, LoanStatus } from "../core/enums";
 
 const GetLoanController = async (req: Request, res: Response) => {
     try {
         configDotenv();
+        const { status } = req.query;
         
         const staff = new Staff();
         const secret = process.env.BUYSIMPLY_JWT_SECRET;
@@ -56,7 +57,15 @@ const GetLoanController = async (req: Request, res: Response) => {
                 createdAt: loan.createdAt,
             }));
         }
-        
+
+        if(status == LoanStatus.ACTIVE || status == LoanStatus.PENDING){
+            loanData = loanData.filter((loan) => loan.status == status);
+        }else{
+            return res.status(HTTP_RESPONSE_CODE.BAD_REQUEST).json({
+                error: `No status of Type<${status}> found`
+            })
+        }
+
         return res.status(HTTP_RESPONSE_CODE.OK).json(loanData)
         // }else{
         //     return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({

@@ -7,7 +7,7 @@ enum AccessLevel{
 
 enum LoanStatus{
     ACTIVE = "active",
-    UNACTIVE = "unactive"
+    PENDING = "pending"
 }
 
 export { AccessLevel, LoanStatus };
