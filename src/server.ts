@@ -26,7 +26,7 @@ class BuySimplyServer{
         this.app.use(cors());
         this.app.use(express.json());
         this.app.use(session({
-            secret: '',
+            secret: process.env.BUYSIMPLY_SESSION_SECRET ?? '',
             resave: false,
             saveUninitialized: true,
             cookie: { secure: true }
