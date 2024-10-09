@@ -142,7 +142,7 @@ const GetUserLoanController = async (req: Request, res: Response) => {
         
         if(email){
             if(!validateEmail(email)) return res.status(HTTP_RESPONSE_CODE.BAD_REQUEST).json({
-                message: "Invalid email provided"
+                error: "Invalid email provided"
             });
             loanData = loanData.filter((loan) => loan.applicant.email == email);
         }
@@ -160,4 +160,4 @@ const GetUserLoanController = async (req: Request, res: Response) => {
     }
 }
 
-export { GetUserLoanController }
+export {  GetLoanController, GetUserLoanController }
