@@ -24,7 +24,7 @@ class BuySimplyServer{
 
     setup(){
         this.app.use(cors());
-        this.app.use(morgan('tiny'))
+        this.app.use(morgan('tiny'));
         this.app.use(express.json());
         this.app.use(session({
             secret: process.env.BUYSIMPLY_SESSION_SECRET ?? '',

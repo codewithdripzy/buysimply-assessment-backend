@@ -103,7 +103,7 @@ const VerifyToken = async (req: Request, res: Response, nextFunction: NextFuncti
                 email: verifyToken.email,
                 role: verifyToken.role
             }
-            
+
             return nextFunction();
         }else{
             return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
@@ -123,6 +123,13 @@ const LogoutAuthController = async (req: Request, res: Response) => {
     try {
         configDotenv();
         
+        // Clear the session or token
+        req.session.destroy((err) => res.status(HTTP_RESPONSE_CODE.OK).json({
+            message: "Something went wrong, try again"
+        }))
+        return res.status(HTTP_RESPONSE_CODE.OK).json({
+            message: "Successfully logged out"
+        });
     } catch (error) {
         console.log(error);
         
