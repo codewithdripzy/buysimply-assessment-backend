@@ -145,23 +145,9 @@ const DeleteUserLoanController = async (req: Request, res: Response) => {
     try {
         configDotenv();
         const { loanId } = req.params;
+        const { id, email, role } = res.locals.staffData;
         
         const staff = new Staff();
-        const secret = process.env.BUYSIMPLY_JWT_SECRET;
-        const token = req.headers.authorization?.split(" ")[1];
-
-        if(!loanId) return res.status(HTTP_RESPONSE_CODE.BAD_REQUEST).json({
-            error: "Provide ID for loan to be deleted"
-        });
-
-        if(!token) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
-            error: "No Api Token Provided"
-        });
-
-        if(!secret) return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
-            error: " Something went wrong, Try again"
-        });
-
         const loans = new Loans();
         let loanData : LoanStruct[] | null = await loans.findAll();
 
@@ -169,11 +155,10 @@ const DeleteUserLoanController = async (req: Request, res: Response) => {
             data: []
         });
 
-        const verifyToken : BuySimplyTokenStruct = jwt.verify(token, secret) as unknown as BuySimplyTokenStruct;
         const userExists = await staff.findOne({
-            id: verifyToken.id,
-            email: verifyToken.email,
-            role: verifyToken.role as AccessLevel,
+            id,
+            email,
+            role: role as AccessLevel,
         });
        
         if(!userExists) return res.status(HTTP_RESPONSE_CODE.UNAUTHORIZED).json({
@@ -181,7 +166,7 @@ const DeleteUserLoanController = async (req: Request, res: Response) => {
         });
 
         
-        if(verifyToken.role == AccessLevel.SUPER_ADMINSITRATOR){
+        if(role == AccessLevel.SUPER_ADMINSITRATOR){
             const loanExists = loanData.filter((loan) => loan.id == loanId);
             const newLoanData = loanData.filter((loan) => loan.id !== loanId);
             
@@ -202,11 +187,10 @@ const DeleteUserLoanController = async (req: Request, res: Response) => {
             });
         }
     } catch (error) {
-        console.log(error);
-        
         return res.status(HTTP_RESPONSE_CODE.INTERNAL_SERVER_ERROR).json({
             message: "Something went wrong, Try again"
         })
     }
 }
+
 export {  GetLoanController, GetUserLoanController, DeleteUserLoanController }
